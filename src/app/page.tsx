@@ -1,12 +1,6 @@
 "use client";
-import React, { useEffect, useRef, FC, useState, Component } from "react";
-import { CSSProperties } from "react";
+import React, { useEffect, useState } from "react";
 
-/** Propsの型定義 */
-interface PropsType {
-  style?: CSSProperties;
-  color?: string;
-}
 interface CircleInfo {
   cx: number;
   cy: number;
@@ -55,16 +49,16 @@ const CircleSVG = (props: CircleInfo) => {
 };
 
 const QCircle = (props: QCircleInfo) => {
-  var cx = props.cx;
-  var cy = props.cy;
-  var r = props.r;
-  var color = props.fill;
-  var startX = Math.round(r * Math.cos(props.thetaStart) + cx);
-  var endX = Math.round(r * Math.cos(props.thetaEnd) + cx);
-  var startY = Math.round(r * Math.sin(props.thetaStart) + cy);
-  var endY = Math.round(r * Math.sin(props.thetaEnd) + cy);
-  var dx = endX - startX;
-  var dy = endY - startY;
+  const cx = props.cx;
+  const cy = props.cy;
+  const r = props.r;
+  const color = props.fill;
+  const startX = Math.round(r * Math.cos(props.thetaStart) + cx);
+  const endX = Math.round(r * Math.cos(props.thetaEnd) + cx);
+  const startY = Math.round(r * Math.sin(props.thetaStart) + cy);
+  const endY = Math.round(r * Math.sin(props.thetaEnd) + cy);
+  const dx = endX - startX;
+  const dy = endY - startY;
   return (
     <path
       d={`M ${cx},${cy} L ${startX},${startY} a ${r} ${r} 0 0 1 ${dx} ${dy} z`}
@@ -74,8 +68,8 @@ const QCircle = (props: QCircleInfo) => {
   );
 };
 const LentiCircle = (props: LentiCircleInfo) => {
-  var theta0 = -Math.PI / 4;
-  var dTheta = (2 * Math.PI) / props.colors.length;
+  const theta0 = -Math.PI / 4;
+  const dTheta = (2 * Math.PI) / props.colors.length;
   return props.colors.map((color, index) => {
     if (index < props.colors.length - 1) {
       return (
@@ -117,8 +111,8 @@ const LentiCircle = (props: LentiCircleInfo) => {
 };
 const LentiArray = (props: LentiArrayInfo) => {
   return props.color2dAry.map((colors, index) => {
-    var cx = 2 * (index % props.sideN) * props.r + props.r + props.x0;
-    var cy =
+    let cx = 2 * (index % props.sideN) * props.r + props.r + props.x0;
+    const cy =
       (2 * props.r * Math.floor(index / props.sideN) * Math.sqrt(3)) / 2 +
       props.y0;
     if (Math.floor(index / props.sideN) % 2 == 1) {
@@ -141,7 +135,7 @@ export default function Home() {
   const [cid, setCid] = useState(0);
   const [sideN, setSideN] = useState(10);
   const [tallN, setTallN] = useState(10);
-  var [color2dAry, setColor2dAry] = useState<string[][]>(
+  const [color2dAry, setColor2dAry] = useState<string[][]>(
     Array(sideN * tallN).fill(["#000000", "#ff0000", "#00ff00", "#0000ff"])
   );
   const [radius, setRadius] = useState(30);
@@ -161,7 +155,7 @@ export default function Home() {
   );
   const [isEditMode, setEditMode] = useState(false);
   const [isMonoview, setMonoview] = useState(false);
-  let editUI = isEditMode ? (
+  const editUI = isEditMode ? (
     <div>
       Width:
       <input
@@ -266,19 +260,19 @@ export default function Home() {
       />
       <button
         onClick={function () {
-          var lines = text.split("\n");
+          const lines = text.split("\n");
           setSideN(Number(lines[0].split(",")[0]));
           setTallN(Number(lines[0].split(",")[1]));
           setRadius(Number(lines[0].split(",")[2]));
           let newColors;
           if (isMonoview) {
             newColors = lines.slice(1).map((line) => {
-              var fields = line.split(",");
+              const fields = line.split(",");
               return [fields[0], fields[0], fields[0], fields[0]];
             });
           } else {
             newColors = lines.slice(1).map((line) => {
-              var fields = line.split(",");
+              const fields = line.split(",");
               return fields;
             });
           }
