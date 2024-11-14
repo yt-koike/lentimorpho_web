@@ -281,7 +281,6 @@ export default function Home() {
       >
         ToSVG
       </button>
-      {/*
       <button
         onClick={function () {
           setText(
@@ -293,7 +292,6 @@ export default function Home() {
       >
         FromSVG
       </button>
-      */}
       <svg
         width="3000"
         height="3000"
