@@ -294,6 +294,19 @@ export default function Home() {
           setSelectedColorHex(color.hex)
         }
       />
+      <button
+        onClick={function () {
+          setColor2dAry(
+            color2dAry.map(x => {
+              const colors = x;
+              colors[monoviewId] = selectedColorHex;
+              return colors;
+            })
+          );
+        }}
+      >
+        Fill
+      </button>
     </div>
   ) : (
     <div></div>
@@ -387,7 +400,7 @@ export default function Home() {
             }
           }}
           onMouseMove={(e) => {
-            e.preventDefault()
+            e.preventDefault();
             if (isMouseDown && isEditMode) {
               changeColorClick(
                 e,
@@ -401,7 +414,7 @@ export default function Home() {
             }
           }}
           onTouchMove={(e) => {
-            e.preventDefault()
+            e.preventDefault();
             if (isTouchDown && isEditMode) {
               changeColorTouch(
                 e,
