@@ -10,11 +10,10 @@ export default function ReadImage() {
     }
   }
 
-  return (
-    <div className="App">
+  return (<div>
       <h2>Add Image:</h2>
       <input type="file" onChange={handleChange} />
       <img src={file} />
-    </div>
+      </div>
   );
 }

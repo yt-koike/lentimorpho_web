@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect,  useState } from "react";
+
 
 interface CircleInfo {
   cx: number;
@@ -17,7 +18,6 @@ interface QCircleInfo {
   thetaEnd: number;
   fill: string;
 }
-
 interface LentiCircleInfo {
   cx: number;
   cy: number;
@@ -131,6 +131,7 @@ const LentiArray = (props: LentiArrayInfo) => {
     );
   });
 };
+
 export default function Home() {
   const [cid, setCid] = useState(0);
   const [sideN, setSideN] = useState(10);
@@ -144,6 +145,13 @@ export default function Home() {
       Array(sideN * tallN).fill(["#000000", "#ff0000", "#00ff00", "#0000ff"])
     );
   }, [sideN, tallN]);
+  useEffect(()=>{
+    setText(
+      `${sideN},${tallN},${radius}\n${color2dAry
+        .map((x) => x.join(","))
+        .join("\n")}`
+    );
+  }, [sideN, tallN, radius, color2dAry])
   const [c1, setC1] = useState("");
   const [c2, setC2] = useState("");
   const [c3, setC3] = useState("");
@@ -281,17 +289,6 @@ export default function Home() {
       >
         ToSVG
       </button>
-      <button
-        onClick={function () {
-          setText(
-            `${sideN},${tallN},${radius}\n${color2dAry
-              .map((x) => x.join(","))
-              .join("\n")}`
-          );
-        }}
-      >
-        FromSVG
-      </button>
       <svg
         width="3000"
         height="3000"
@@ -310,4 +307,5 @@ export default function Home() {
       </svg>
     </div>
   );
+
 }
