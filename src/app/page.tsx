@@ -35,12 +35,12 @@ function changeColor(
   color2dAry: string[][],
   setColor2dAry: React.Dispatch<React.SetStateAction<string[][]>>,
   color: string,
-  imgId: number
+  imgId: number,
+  r: number,
+  sideN: number
 ) {
   const x0 = 0;
   const y0 = 0;
-  const sideN = 10;
-  const r = 30;
   const rowIdx = Math.floor((relativeY - y0) / (r * Math.sqrt(3)));
   const colIdx =
     rowIdx % 2 == 0
@@ -63,26 +63,30 @@ function changeColorTouch(
   color2dAry: string[][],
   setColor2dAry: React.Dispatch<React.SetStateAction<string[][]>>,
   color: string,
-  imgId: number
+  imgId: number,
+  r: number,
+  sideN: number
 ) {
   const svgCanvas = document.getElementById("svg");
   const x =
     e.touches[0].clientX - (svgCanvas?.getBoundingClientRect().left ?? 0);
   const y =
     e.touches[0].clientY - (svgCanvas?.getBoundingClientRect().top ?? 0);
-  changeColor(x, y, color2dAry, setColor2dAry, color, imgId);
+  changeColor(x, y, color2dAry, setColor2dAry, color, imgId, r, sideN);
 }
 function changeColorClick(
   e: React.MouseEvent<SVGSVGElement, MouseEvent>,
   color2dAry: string[][],
   setColor2dAry: React.Dispatch<React.SetStateAction<string[][]>>,
   color: string,
-  imgId: number
+  imgId: number,
+  r: number,
+  sideN: number
 ) {
   const svgCanvas = document.getElementById("svg");
   const x = e.clientX - (svgCanvas?.getBoundingClientRect().left ?? 0);
   const y = e.clientY - (svgCanvas?.getBoundingClientRect().top ?? 0);
-  changeColor(x, y, color2dAry, setColor2dAry, color, imgId);
+  changeColor(x, y, color2dAry, setColor2dAry, color, imgId, r, sideN);
 }
 const QCircle = (props: QCircleInfo) => {
   const cx = props.cx;
@@ -339,7 +343,9 @@ export default function Home() {
                 color2dAry,
                 setColor2dAry,
                 selectedColorHex,
-                monoviewId
+                monoviewId,
+                radius,
+                sideN
               );
             }
           }}
@@ -353,29 +359,37 @@ export default function Home() {
                 color2dAry,
                 setColor2dAry,
                 selectedColorHex,
-                monoviewId
+                monoviewId,
+                radius,
+                sideN
               );
             }
           }}
           onMouseMove={(e) => {
+            e.preventDefault()
             if (isMouseDown && isEditMode) {
               changeColorClick(
                 e,
                 color2dAry,
                 setColor2dAry,
                 selectedColorHex,
-                monoviewId
+                monoviewId,
+                radius,
+                sideN
               );
             }
           }}
           onTouchMove={(e) => {
+            e.preventDefault()
             if (isTouchDown && isEditMode) {
               changeColorTouch(
                 e,
                 color2dAry,
                 setColor2dAry,
                 selectedColorHex,
-                monoviewId
+                monoviewId,
+                radius,
+                sideN
               );
             }
           }}
