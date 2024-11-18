@@ -157,8 +157,8 @@ const LentiArray = (props: LentiArrayInfo) => {
 
 export default function Home() {
   const [cid, setCid] = useState(0);
-  const [sideN, setSideN] = useState(10);
-  const [tallN, setTallN] = useState(10);
+  const [sideN, setSideN] = useState(5);
+  const [tallN, setTallN] = useState(5);
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [isTouchDown, setIsTouchDown] = useState(false);
   const [selectedColorHex, setSelectedColorHex] = useState("");
@@ -330,9 +330,9 @@ export default function Home() {
       <div>
         <svg
           id="svg"
-          width="3000"
-          height="3000"
-          viewBox="0 0 3000 3000"
+          width="500"
+          height="500"
+          viewBox="0 0 500 500"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           onTouchStart={(e) => {
