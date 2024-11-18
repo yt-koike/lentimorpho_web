@@ -25,12 +25,14 @@ interface LentiCircleInfo {
   colors: string[];
   stroke?: string;
   stroke_width: number;
+  monoviewId?:number;
 }
 interface LentiArrayInfo {
   x0: number;
   y0: number;
   sideN: number;
   tallN?: number;
+  monoviewId?:number;
   r: number;
   highlightId?: number;
   color2dAry: string[][];
@@ -69,9 +71,10 @@ const QCircle = (props: QCircleInfo) => {
 };
 const LentiCircle = (props: LentiCircleInfo) => {
   const theta0 = -Math.PI / 4;
-  const dTheta = (2 * Math.PI) / props.colors.length;
-  return props.colors.map((color, index) => {
-    if (index < props.colors.length - 1) {
+  const colors = (props.monoviewId == null)?props.colors:[props.colors[props.monoviewId],props.colors[props.monoviewId],props.colors[props.monoviewId],props.colors[props.monoviewId]]
+  const dTheta = (2 * Math.PI) / colors.length;
+  return colors.map((color, index) => {
+    if (index < colors.length - 1) {
       return (
         <QCircle
           key={`lenth${index}`}
@@ -127,6 +130,7 @@ const LentiArray = (props: LentiArrayInfo) => {
         colors={colors}
         stroke="red"
         stroke_width={index == props.highlightId ? props.r / 10 : 0}
+        monoviewId={props.monoviewId}
       />
     );
   });
@@ -163,7 +167,8 @@ export default function Home() {
   );
   const [isEditMode, setEditMode] = useState(false);
   const [isMonoview, setMonoview] = useState(false);
-  const editUI = isEditMode ? (
+  const [monoviewId, setMonoviewId] = useState(0);
+    const editUI = isEditMode ? (
     <div>
       Width:
       <input
@@ -258,7 +263,17 @@ export default function Home() {
         checked={isMonoview}
         onChange={() => setMonoview(!isMonoview)}
       />
-      Monoview
+      Monoview:
+      <input
+        type="number"
+        min="0"
+        max="3"
+        value={monoviewId}
+        onChange={(e) => {
+          setMonoviewId(Number(e.target.value));
+        }}
+        placeholder="CID"
+      />
       <br></br>
       <textarea
         value={text}
@@ -272,18 +287,10 @@ export default function Home() {
           setSideN(Number(lines[0].split(",")[0]));
           setTallN(Number(lines[0].split(",")[1]));
           setRadius(Number(lines[0].split(",")[2]));
-          let newColors;
-          if (isMonoview) {
-            newColors = lines.slice(1).map((line) => {
-              const fields = line.split(",");
-              return [fields[0], fields[0], fields[0], fields[0]];
-            });
-          } else {
-            newColors = lines.slice(1).map((line) => {
-              const fields = line.split(",");
-              return fields;
-            });
-          }
+          const newColors=lines.slice(1).map((line) => {
+            const fields = line.split(",");
+            return fields;
+          });
           setColor2dAry(newColors);
         }}
       >
@@ -303,6 +310,7 @@ export default function Home() {
           r={radius}
           color2dAry={color2dAry}
           highlightId={isEditMode ? cid : undefined}
+          monoviewId={(isMonoview)?monoviewId:undefined}
         />
       </svg>
     </div>
