@@ -159,6 +159,8 @@ export default function Home() {
   const [cid, setCid] = useState(0);
   const [sideN, setSideN] = useState(5);
   const [tallN, setTallN] = useState(5);
+  const [svgWidth, setSvgWidth] = useState(500);
+  const [svgHeight, setSvgHeight] = useState(500);
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [isTouchDown, setIsTouchDown] = useState(false);
   const [selectedColorHex, setSelectedColorHex] = useState("");
@@ -196,13 +198,32 @@ export default function Home() {
       <input
         type="number"
         min="1"
+        value={svgWidth}
+        onChange={(e) => {
+          setSvgWidth(Number(e.target.value));
+        }}
+      />
+      Height:
+      <input
+        type="number"
+        min="1"
+        value={svgHeight}
+        onChange={(e) => {
+          setSvgHeight(Number(e.target.value));
+        }}
+      />
+      <br></br>
+      SideN:
+      <input
+        type="number"
+        min="1"
         value={sideN}
         onChange={(e) => {
           setSideN(Number(e.target.value));
         }}
         placeholder="CID"
       />
-      Height:
+      TallN:
       <input
         type="number"
         min="1"
@@ -330,9 +351,9 @@ export default function Home() {
       <div>
         <svg
           id="svg"
-          width="500"
-          height="500"
-          viewBox="0 0 500 500"
+          width={svgWidth}
+          height={svgHeight}
+          viewBox={`0 0 ${svgWidth} ${svgHeight}`}
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           onTouchStart={(e) => {
