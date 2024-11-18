@@ -189,10 +189,11 @@ export default function Home() {
       .map((x) => x.join(","))
       .join("\n")}`
   );
-  const [isEditMode, setEditMode] = useState(false);
+  const [isShowEditUI, setEditMode] = useState(false);
+  const [isPenOn, setIsPenOn] = useState(false);
   const [isMonoview, setMonoview] = useState(false);
   const [monoviewId, setMonoviewId] = useState(0);
-  const editUI = isEditMode ? (
+  const editUI = isShowEditUI ? (
     <div>
       Width:
       <input
@@ -311,14 +312,14 @@ export default function Home() {
   ) : (
     <div></div>
   );
-
+useEffect(()=>{if(isShowEditUI){setIsPenOn(true)}},[isShowEditUI])
   return (
     <div>
       <div>
         <input
           type="checkbox"
-          checked={isEditMode}
-          onChange={() => setEditMode(!isEditMode)}
+          checked={isShowEditUI}
+          onChange={() => setEditMode(!isShowEditUI)}
         />
         Enable Edit UI
         {editUI}
@@ -339,6 +340,14 @@ export default function Home() {
             setMonoviewId(Number(e.target.value));
           }}
         />
+      </div>
+      <div>
+      <input
+          type="checkbox"
+          checked={isPenOn}
+          onChange={() => setIsPenOn(!isPenOn)}
+        />
+        Enable Pen
       </div>
       <textarea
         value={text}
@@ -371,7 +380,7 @@ export default function Home() {
           xmlns="http://www.w3.org/2000/svg"
           onTouchStart={(e) => {
             setIsTouchDown(true);
-            if (isEditMode) {
+            if (isPenOn) {
               changeColorTouch(
                 e,
                 color2dAry,
@@ -387,7 +396,7 @@ export default function Home() {
           onMouseUp={() => setIsMouseDown(false)}
           onMouseDown={(e) => {
             setIsMouseDown(true);
-            if (isEditMode) {
+            if (isPenOn) {
               changeColorClick(
                 e,
                 color2dAry,
@@ -401,7 +410,7 @@ export default function Home() {
           }}
           onMouseMove={(e) => {
             e.preventDefault();
-            if (isMouseDown && isEditMode) {
+            if (isMouseDown && isPenOn) {
               changeColorClick(
                 e,
                 color2dAry,
@@ -415,7 +424,7 @@ export default function Home() {
           }}
           onTouchMove={(e) => {
             e.preventDefault();
-            if (isTouchDown && isEditMode) {
+            if (isTouchDown && isPenOn) {
               changeColorTouch(
                 e,
                 color2dAry,
