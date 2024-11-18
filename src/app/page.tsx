@@ -1,15 +1,7 @@
 "use client";
-import React, { useEffect,  useState } from "react";
+import React, { useEffect, useState } from "react";
+import { SketchPicker } from "react-color";
 
-
-interface CircleInfo {
-  cx: number;
-  cy: number;
-  r: number;
-  fill: string;
-  stroke?: string;
-  stroke_width: number;
-}
 interface QCircleInfo {
   cx: number;
   cy: number;
@@ -25,31 +17,73 @@ interface LentiCircleInfo {
   colors: string[];
   stroke?: string;
   stroke_width: number;
-  monoviewId?:number;
+  monoviewId?: number;
 }
 interface LentiArrayInfo {
   x0: number;
   y0: number;
   sideN: number;
   tallN?: number;
-  monoviewId?:number;
+  monoviewId?: number;
   r: number;
   highlightId?: number;
   color2dAry: string[][];
 }
-const CircleSVG = (props: CircleInfo) => {
-  return (
-    <circle
-      cx={props.cx}
-      cy={props.cy}
-      r={props.r}
-      fill={props.fill}
-      stroke={props.stroke ?? "none"}
-      strokeWidth={props.stroke_width}
-    />
+function changeColor(
+  relativeX: number,
+  relativeY: number,
+  color2dAry: string[][],
+  setColor2dAry: React.Dispatch<React.SetStateAction<string[][]>>,
+  color: string,
+  imgId: number
+) {
+  const x0 = 0;
+  const y0 = 0;
+  const sideN = 10;
+  const r = 30;
+  const rowIdx = Math.floor((relativeY - y0) / (r * Math.sqrt(3)));
+  const colIdx =
+    rowIdx % 2 == 0
+      ? Math.floor((relativeX - x0) / (r * 2))
+      : Math.floor((relativeX - x0 - r) / (r * 2));
+  const cid = sideN * rowIdx + colIdx;
+  setColor2dAry(
+    color2dAry.map((colors, index) => {
+      if (index != cid) {
+        return colors;
+      }
+      const c = colors.concat();
+      c[imgId] = color;
+      return c;
+    })
   );
-};
-
+}
+function changeColorTouch(
+  e: React.TouchEvent<SVGSVGElement>,
+  color2dAry: string[][],
+  setColor2dAry: React.Dispatch<React.SetStateAction<string[][]>>,
+  color: string,
+  imgId: number
+) {
+  const svgCanvas = document.getElementById("svg");
+  const x =
+    e.touches[0].clientX - (svgCanvas?.getBoundingClientRect().left ?? 0);
+  const y =
+    e.touches[0].clientY - (svgCanvas?.getBoundingClientRect().top ?? 0);
+  changeColor(x, y, color2dAry, setColor2dAry, color, imgId);
+}
+function changeColorClick(
+  e: React.MouseEvent<SVGSVGElement, MouseEvent>,
+  color2dAry: string[][],
+  setColor2dAry: React.Dispatch<React.SetStateAction<string[][]>>,
+  color: string,
+  imgId: number
+) {
+  const svgCanvas = document.getElementById("svg");
+  const x = e.clientX - (svgCanvas?.getBoundingClientRect().left ?? 0);
+  const y = e.clientY - (svgCanvas?.getBoundingClientRect().top ?? 0);
+  changeColor(x, y, color2dAry, setColor2dAry, color, imgId);
+}
 const QCircle = (props: QCircleInfo) => {
   const cx = props.cx;
   const cy = props.cy;
@@ -71,53 +105,34 @@ const QCircle = (props: QCircleInfo) => {
 };
 const LentiCircle = (props: LentiCircleInfo) => {
   const theta0 = -Math.PI / 4;
-  const colors = (props.monoviewId == null)?props.colors:[props.colors[props.monoviewId],props.colors[props.monoviewId],props.colors[props.monoviewId],props.colors[props.monoviewId]]
+  const colors =
+    props.monoviewId == null
+      ? props.colors
+      : [
+          props.colors[props.monoviewId],
+          props.colors[props.monoviewId],
+          props.colors[props.monoviewId],
+          props.colors[props.monoviewId],
+        ];
   const dTheta = (2 * Math.PI) / colors.length;
-  return colors.map((color, index) => {
-    if (index < colors.length - 1) {
-      return (
-        <QCircle
-          key={`lenth${index}`}
-          cx={props.cx}
-          cy={props.cy}
-          r={props.r}
-          thetaStart={index * dTheta + theta0}
-          thetaEnd={(index + 1) * dTheta + theta0}
-          fill={color}
-        />
-      );
-    } else {
-      return (
-        <>
-          <QCircle
-            key={`lenth${index}`}
-            cx={props.cx}
-            cy={props.cy}
-            r={props.r}
-            thetaStart={index * dTheta + theta0}
-            thetaEnd={(index + 1) * dTheta + theta0}
-            fill={color}
-          />
-          <CircleSVG
-            key={`outline${index}`}
-            cx={props.cx}
-            cy={props.cy}
-            r={props.r}
-            fill="none"
-            stroke={props.stroke ?? "red"}
-            stroke_width={props.stroke_width}
-          />
-        </>
-      );
-    }
-  });
+  return colors.map((color, index) => (
+    <QCircle
+      key={`${props.cx}${props.cy}lenti${index}`}
+      cx={props.cx}
+      cy={props.cy}
+      r={props.r}
+      thetaStart={index * dTheta + theta0}
+      thetaEnd={(index + 1) * dTheta + theta0}
+      fill={color}
+    />
+  ));
 };
 const LentiArray = (props: LentiArrayInfo) => {
   return props.color2dAry.map((colors, index) => {
-    let cx = 2 * (index % props.sideN) * props.r + props.r + props.x0;
+    let cx = 2 * (index % props.sideN) * props.r + (props.r + props.x0);
     const cy =
       (2 * props.r * Math.floor(index / props.sideN) * Math.sqrt(3)) / 2 +
-      props.y0;
+      (props.r + props.y0);
     if (Math.floor(index / props.sideN) % 2 == 1) {
       cx += props.r;
     }
@@ -140,6 +155,9 @@ export default function Home() {
   const [cid, setCid] = useState(0);
   const [sideN, setSideN] = useState(10);
   const [tallN, setTallN] = useState(10);
+  const [isMouseDown, setIsMouseDown] = useState(false);
+  const [isTouchDown, setIsTouchDown] = useState(false);
+  const [selectedColorHex, setSelectedColorHex] = useState("");
   const [color2dAry, setColor2dAry] = useState<string[][]>(
     Array(sideN * tallN).fill(["#000000", "#ff0000", "#00ff00", "#0000ff"])
   );
@@ -149,13 +167,13 @@ export default function Home() {
       Array(sideN * tallN).fill(["#000000", "#ff0000", "#00ff00", "#0000ff"])
     );
   }, [sideN, tallN]);
-  useEffect(()=>{
+  useEffect(() => {
     setText(
       `${sideN},${tallN},${radius}\n${color2dAry
         .map((x) => x.join(","))
         .join("\n")}`
     );
-  }, [sideN, tallN, radius, color2dAry])
+  }, [sideN, tallN, radius, color2dAry]);
   const [c1, setC1] = useState("");
   const [c2, setC2] = useState("");
   const [c3, setC3] = useState("");
@@ -168,7 +186,7 @@ export default function Home() {
   const [isEditMode, setEditMode] = useState(false);
   const [isMonoview, setMonoview] = useState(false);
   const [monoviewId, setMonoviewId] = useState(0);
-    const editUI = isEditMode ? (
+  const editUI = isEditMode ? (
     <div>
       Width:
       <input
@@ -245,36 +263,45 @@ export default function Home() {
         OK
       </button>
       <br></br>
+      <SketchPicker
+        color={selectedColorHex}
+        onChange={(color: { hex: React.SetStateAction<string> }) =>
+          setSelectedColorHex(color.hex)
+        }
+      />
     </div>
   ) : (
     <div></div>
   );
+
   return (
     <div>
-      <input
-        type="checkbox"
-        checked={isEditMode}
-        onChange={() => setEditMode(!isEditMode)}
-      />
-      Enable Edit UI
-      {editUI}
-      <input
-        type="checkbox"
-        checked={isMonoview}
-        onChange={() => setMonoview(!isMonoview)}
-      />
-      Monoview:
-      <input
-        type="number"
-        min="0"
-        max="3"
-        value={monoviewId}
-        onChange={(e) => {
-          setMonoviewId(Number(e.target.value));
-        }}
-        placeholder="CID"
-      />
-      <br></br>
+      <div>
+        <input
+          type="checkbox"
+          checked={isEditMode}
+          onChange={() => setEditMode(!isEditMode)}
+        />
+        Enable Edit UI
+        {editUI}
+      </div>
+      <div>
+        <input
+          type="checkbox"
+          checked={isMonoview}
+          onChange={() => setMonoview(!isMonoview)}
+        />
+        Monoview:
+        <input
+          type="number"
+          min="0"
+          max="3"
+          value={monoviewId}
+          onChange={(e) => {
+            setMonoviewId(Number(e.target.value));
+          }}
+        />
+      </div>
       <textarea
         value={text}
         onChange={(e) => {
@@ -287,7 +314,7 @@ export default function Home() {
           setSideN(Number(lines[0].split(",")[0]));
           setTallN(Number(lines[0].split(",")[1]));
           setRadius(Number(lines[0].split(",")[2]));
-          const newColors=lines.slice(1).map((line) => {
+          const newColors = lines.slice(1).map((line) => {
             const fields = line.split(",");
             return fields;
           });
@@ -296,24 +323,74 @@ export default function Home() {
       >
         ToSVG
       </button>
-      <svg
-        width="3000"
-        height="3000"
-        viewBox="0 0 3000 3000"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <LentiArray
-          x0={50}
-          y0={50}
-          sideN={sideN}
-          r={radius}
-          color2dAry={color2dAry}
-          highlightId={isEditMode ? cid : undefined}
-          monoviewId={(isMonoview)?monoviewId:undefined}
-        />
-      </svg>
+      <div>
+        <svg
+          id="svg"
+          width="3000"
+          height="3000"
+          viewBox="0 0 3000 3000"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          onTouchStart={(e) => {
+            setIsTouchDown(true);
+            if (isEditMode) {
+              changeColorTouch(
+                e,
+                color2dAry,
+                setColor2dAry,
+                selectedColorHex,
+                monoviewId
+              );
+            }
+          }}
+          onTouchEnd={() => setIsTouchDown(false)}
+          onMouseUp={() => setIsMouseDown(false)}
+          onMouseDown={(e) => {
+            setIsMouseDown(true);
+            if (isEditMode) {
+              changeColorClick(
+                e,
+                color2dAry,
+                setColor2dAry,
+                selectedColorHex,
+                monoviewId
+              );
+            }
+          }}
+          onMouseMove={(e) => {
+            if (isMouseDown && isEditMode) {
+              changeColorClick(
+                e,
+                color2dAry,
+                setColor2dAry,
+                selectedColorHex,
+                monoviewId
+              );
+            }
+          }}
+          onTouchMove={(e) => {
+            if (isTouchDown && isEditMode) {
+              changeColorTouch(
+                e,
+                color2dAry,
+                setColor2dAry,
+                selectedColorHex,
+                monoviewId
+              );
+            }
+          }}
+        >
+          <LentiArray
+            x0={0}
+            y0={0}
+            sideN={sideN}
+            r={radius}
+            color2dAry={color2dAry}
+            //highlightId={isEditMode ? cid : undefined}
+            monoviewId={isMonoview ? monoviewId : undefined}
+          />
+        </svg>
+      </div>
     </div>
   );
-
 }
