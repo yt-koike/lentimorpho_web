@@ -1,5 +1,4 @@
 "use client";
-import { wrap } from "module";
 import React, { useEffect, useState } from "react";
 import { SketchPicker } from "react-color";
 
@@ -88,23 +87,6 @@ function changeColorClick(
   const x = e.clientX - (svgCanvas?.getBoundingClientRect().left ?? 0);
   const y = e.clientY - (svgCanvas?.getBoundingClientRect().top ?? 0);
   changeColor(x, y, color2dAry, setColor2dAry, color, imgId, r, sideN);
-}
-function PumpUI() {
-  return (
-    <>
-      <input
-        type="text"
-        onChange={(e) => setIp(e.target.value)}
-        value={ip}
-      ></input>
-      <input
-        type="text"
-        onChange={(e) => setOperation(e.target.value)}
-        value={operation}
-      ></input>
-      <button onClick={() => fetch(`http://${ip}/${operation}`)}>Send</button>
-    </>
-  );
 }
 const QCircle = (props: QCircleInfo) => {
   const cx = props.cx;
