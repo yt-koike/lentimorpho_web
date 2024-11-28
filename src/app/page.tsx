@@ -1,4 +1,5 @@
 "use client";
+import { wrap } from "module";
 import React, { useEffect, useState } from "react";
 import { SketchPicker } from "react-color";
 
@@ -88,6 +89,23 @@ function changeColorClick(
   const y = e.clientY - (svgCanvas?.getBoundingClientRect().top ?? 0);
   changeColor(x, y, color2dAry, setColor2dAry, color, imgId, r, sideN);
 }
+function PumpUI() {
+  return (
+    <>
+      <input
+        type="text"
+        onChange={(e) => setIp(e.target.value)}
+        value={ip}
+      ></input>
+      <input
+        type="text"
+        onChange={(e) => setOperation(e.target.value)}
+        value={operation}
+      ></input>
+      <button onClick={() => fetch(`http://${ip}/${operation}`)}>Send</button>
+    </>
+  );
+}
 const QCircle = (props: QCircleInfo) => {
   const cx = props.cx;
   const cy = props.cy;
@@ -167,6 +185,8 @@ export default function Home() {
   const [color2dAry, setColor2dAry] = useState<string[][]>(
     Array(sideN * tallN).fill(["#000000", "#ff0000", "#00ff00", "#0000ff"])
   );
+  const [ip, setIp] = useState("");
+  const [operation, setOperation] = useState("");
   const [radius, setRadius] = useState(30);
   useEffect(() => {
     setColor2dAry(
@@ -191,6 +211,7 @@ export default function Home() {
   );
   const [isShowEditUI, setEditMode] = useState(false);
   const [isPenOn, setIsPenOn] = useState(false);
+  const [isPumpOn, setIsPumpOn] = useState(false);
   const [isMonoview, setMonoview] = useState(false);
   const [monoviewId, setMonoviewId] = useState(0);
   const editUI = isShowEditUI ? (
@@ -298,7 +319,7 @@ export default function Home() {
       <button
         onClick={function () {
           setColor2dAry(
-            color2dAry.map(x => {
+            color2dAry.map((x) => {
               const colors = x;
               colors[monoviewId] = selectedColorHex;
               return colors;
@@ -312,64 +333,126 @@ export default function Home() {
   ) : (
     <div></div>
   );
-useEffect(()=>{if(isShowEditUI){setIsPenOn(true)}},[isShowEditUI])
+  useEffect(() => {
+    if (isShowEditUI) {
+      setIsPenOn(true);
+    }
+  }, [isShowEditUI]);
+
   return (
     <div>
-      <div>
-        <input
-          type="checkbox"
-          checked={isShowEditUI}
-          onChange={() => setEditMode(!isShowEditUI)}
-        />
-        Enable Edit UI
-        {editUI}
-      </div>
-      <div>
-        <input
-          type="checkbox"
-          checked={isMonoview}
-          onChange={() => setMonoview(!isMonoview)}
-        />
-        Monoview:
-        <input
-          type="number"
-          min="0"
-          max="3"
-          value={monoviewId}
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+      ></meta>
+      <div id="UIs" style={{ overflow: "hidden" }}>
+        <div id="editui" style={{ float: "left" }}>
+          <button onClick={() => setEditMode(!isShowEditUI)}>
+            <div style={{ width: "50px", height: "50px" }}>
+              <img
+                src="./spanner-wrench-svgrepo-com.svg"
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              ></img>
+            </div>
+          </button>
+          {editUI}
+        </div>
+
+        <div style={{ float: "left" }}>
+          <button onClick={() => setIsPenOn(!isPenOn)}>
+            <div style={{ width: "50px", height: "50px" }}>
+              {isPenOn ? (
+                <img
+                  src="./1021031_pen_icon.png"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                  }}
+                ></img>
+              ) : (
+                <></>
+              )}
+            </div>
+          </button>
+        </div>
+        <div style={{ float: "left" }}>
+          <button onClick={() => setIsPumpOn(!isPumpOn)}>
+            <div style={{ width: "50px", height: "50px" }}>Pump</div>
+          </button>
+          {isPumpOn ? (
+            <ul style={{ flex: "wrap", float: "right", listStyle: "none" }}>
+              <li>
+                {" "}
+                <input
+                  type="text"
+                  placeholder="IP address"
+                  onChange={(e) => setIp(e.target.value)}
+                  value={ip}
+                ></input>
+              </li>
+              <li>
+                <input
+                  type="text"
+                  placeholder="Operation"
+                  onChange={(e) => setOperation(e.target.value)}
+                  value={operation}
+                ></input>
+              </li>
+              <li>
+                <button onClick={() => fetch(`http://${ip}/${operation}`)}>
+                  Send http://{ip}/{operation}
+                </button>
+              </li>
+            </ul>
+          ) : (
+            <></>
+          )}
+        </div>
+        <div style={{ float: "left" }}>
+          <button onClick={() => setMonoview(!isMonoview)}>
+            {" "}
+            <div style={{ width: "50px", height: "50px" }}>
+              {isMonoview ? "To Multi" : "To Mono"}
+            </div>
+          </button>
+          {isMonoview ? (
+            <input
+              type="number"
+              min="0"
+              max="3"
+              value={monoviewId}
+              onChange={(e) => {
+                setMonoviewId(Number(e.target.value));
+              }}
+            />
+          ) : (
+            <></>
+          )}
+        </div>
+        <textarea
+          value={text}
+          style={{ float: "left" }}
           onChange={(e) => {
-            setMonoviewId(Number(e.target.value));
+            setText(e.target.value);
           }}
         />
+        <button
+          onClick={function () {
+            const lines = text.split("\n");
+            setSideN(Number(lines[0].split(",")[0]));
+            setTallN(Number(lines[0].split(",")[1]));
+            setRadius(Number(lines[0].split(",")[2]));
+            const newColors = lines.slice(1).map((line) => {
+              const fields = line.split(",");
+              return fields;
+            });
+            setColor2dAry(newColors);
+          }}
+        >
+          ToSVG
+        </button>
       </div>
-      <div>
-      <input
-          type="checkbox"
-          checked={isPenOn}
-          onChange={() => setIsPenOn(!isPenOn)}
-        />
-        Enable Pen
-      </div>
-      <textarea
-        value={text}
-        onChange={(e) => {
-          setText(e.target.value);
-        }}
-      />
-      <button
-        onClick={function () {
-          const lines = text.split("\n");
-          setSideN(Number(lines[0].split(",")[0]));
-          setTallN(Number(lines[0].split(",")[1]));
-          setRadius(Number(lines[0].split(",")[2]));
-          const newColors = lines.slice(1).map((line) => {
-            const fields = line.split(",");
-            return fields;
-          });
-          setColor2dAry(newColors);
-        }}
-      >
-        ToSVG
-      </button>
       <div>
         <svg
           id="svg"
