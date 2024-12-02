@@ -382,7 +382,13 @@ export default function Home() {
                 ></input>
               </li>
               <li>
-                <button onClick={() => fetch(`http://${ip}/${operation}`)}>
+                <button
+                  onClick={() =>
+                    fetch(`http://${ip}/${operation}`, {
+                      method: "GET",
+                    })
+                  }
+                >
                   Send http://{ip}/{operation}
                 </button>
               </li>
