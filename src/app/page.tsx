@@ -58,6 +58,26 @@ function changeColor(
     })
   );
 }
+
+function downloadSvgAsSvg() {
+  // https://qiita.com/yo16/items/014fffcf89a80fc2392a
+  // svg要素を取得
+  const svgNode = document.getElementById("svg");
+  if (svgNode == null) return;
+  const svgText = new XMLSerializer().serializeToString(svgNode);
+  const svgBlob = new Blob([svgText], { type: "image/svg+xml;charset=utf-8" });
+  const svgUrl = URL.createObjectURL(svgBlob);
+
+  // a要素を作ってダウンロード
+  const a = document.createElement("a");
+  a.href = svgUrl;
+  a.download = `Lenticular.svg`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(svgUrl);
+}
+
 function changeColorTouch(
   e: React.TouchEvent<SVGSVGElement>,
   color2dAry: string[][],
@@ -350,6 +370,20 @@ export default function Home() {
         </button>
       </div>
       <div style={{ float: "left" }}>
+        <button onClick={() => downloadSvgAsSvg()}>
+          <div style={{ width: "50px", height: "50px" }}>
+            <img
+              src="./downloads.png"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+              }}
+            ></img>
+          </div>
+        </button>
+      </div>
+      <div style={{ float: "left" }}>
         <button onClick={() => setIsPumpOn(!isPumpOn)}>
           <div style={{ width: "50px", height: "50px" }}>Pump</div>
         </button>
@@ -429,7 +463,7 @@ export default function Home() {
           setSideN(newSideN);
           setTallN(newTallN);
           setRadius(Number(lines[0].split(",")[2]));
-          setSvgWidth(newSideN * radius * 2);
+          setSvgWidth(newSideN * radius * 2 + radius);
           setSvgHeight(newTallN * radius * 2);
           setColor2dAry(newColors);
         }}
