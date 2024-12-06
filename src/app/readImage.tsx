@@ -10,10 +10,11 @@ export default function ReadImage() {
     }
   }
 
-  return (<div>
+  return (
+    <div>
       <h2>Add Image:</h2>
       <input type="file" onChange={handleChange} />
-      <img src={file} />
-      </div>
+      <img src={file} alt="upload image" />
+    </div>
   );
 }
