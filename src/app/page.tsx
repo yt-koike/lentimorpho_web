@@ -170,11 +170,7 @@ export default function Home() {
   const [ip, setIp] = useState("");
   const [operation, setOperation] = useState("");
   const [radius, setRadius] = useState(30);
-  useEffect(() => {
-    setColor2dAry(
-      Array(sideN * tallN).fill(["#000000", "#ff0000", "#00ff00", "#0000ff"])
-    );
-  }, [sideN, tallN]);
+
   useEffect(() => {
     setText(
       `${sideN},${tallN},${radius}\n${color2dAry
@@ -321,126 +317,135 @@ export default function Home() {
     }
   }, [isShowEditUI]);
 
+  const UI = (
+    <div id="UIs" style={{ overflow: "hidden" }}>
+      <div id="editui" style={{ float: "left" }}>
+        <button onClick={() => setEditMode(!isShowEditUI)}>
+          <div style={{ width: "50px", height: "50px" }}>
+            <img
+              src="./spanner-wrench-svgrepo-com.svg"
+              style={{ width: "100%", height: "100%", objectFit: "contain" }}
+            ></img>
+          </div>
+        </button>
+        {editUI}
+      </div>
+
+      <div style={{ float: "left" }}>
+        <button onClick={() => setIsPenOn(!isPenOn)}>
+          <div style={{ width: "50px", height: "50px" }}>
+            {isPenOn ? (
+              <img
+                src="./1021031_pen_icon.png"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                }}
+              ></img>
+            ) : (
+              <></>
+            )}
+          </div>
+        </button>
+      </div>
+      <div style={{ float: "left" }}>
+        <button onClick={() => setIsPumpOn(!isPumpOn)}>
+          <div style={{ width: "50px", height: "50px" }}>Pump</div>
+        </button>
+        {isPumpOn ? (
+          <ul style={{ flex: "wrap", float: "right", listStyle: "none" }}>
+            <li>
+              {" "}
+              <input
+                type="text"
+                placeholder="IP address"
+                onChange={(e) => setIp(e.target.value)}
+                value={ip}
+              ></input>
+            </li>
+            <li>
+              <input
+                type="text"
+                placeholder="Operation"
+                onChange={(e) => setOperation(e.target.value)}
+                value={operation}
+              ></input>
+            </li>
+            <li>
+              <button
+                onClick={() =>
+                  fetch(`http://${ip}/${operation}`, {
+                    method: "GET",
+                  })
+                }
+              >
+                Send http://{ip}/{operation}
+              </button>
+            </li>
+          </ul>
+        ) : (
+          <></>
+        )}
+      </div>
+      <div style={{ float: "left" }}>
+        <button onClick={() => setMonoview(!isMonoview)}>
+          {" "}
+          <div style={{ width: "50px", height: "50px" }}>
+            {isMonoview ? "To Multi" : "To Mono"}
+          </div>
+        </button>
+        {isMonoview ? (
+          <input
+            type="number"
+            min="0"
+            max="3"
+            value={monoviewId}
+            onChange={(e) => {
+              setMonoviewId(Number(e.target.value));
+            }}
+          />
+        ) : (
+          <></>
+        )}
+      </div>
+      <textarea
+        value={text}
+        style={{ float: "left" }}
+        onChange={(e) => {
+          setText(e.target.value);
+        }}
+      />
+      <button
+        onClick={function () {
+          const lines = text.split("\n");
+          const newSideN = Number(lines[0].split(",")[0]);
+          const newTallN = Number(lines[0].split(",")[1]);
+          const newColors = lines.slice(1).map((line) => {
+            const fields = line.split(",");
+            return fields;
+          });
+          setColor2dAry(newColors);
+          setSideN(newSideN);
+          setTallN(newTallN);
+          setRadius(Number(lines[0].split(",")[2]));
+          setSvgWidth(newSideN * radius * 2);
+          setSvgHeight(newTallN * radius * 2);
+          setColor2dAry(newColors);
+        }}
+      >
+        ToSVG
+      </button>
+    </div>
+  );
+
   return (
     <div>
       <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
       ></meta>
-      <div id="UIs" style={{ overflow: "hidden" }}>
-        <div id="editui" style={{ float: "left" }}>
-          <button onClick={() => setEditMode(!isShowEditUI)}>
-            <div style={{ width: "50px", height: "50px" }}>
-              <img
-                src="./spanner-wrench-svgrepo-com.svg"
-                style={{ width: "100%", height: "100%", objectFit: "contain" }}
-              ></img>
-            </div>
-          </button>
-          {editUI}
-        </div>
-
-        <div style={{ float: "left" }}>
-          <button onClick={() => setIsPenOn(!isPenOn)}>
-            <div style={{ width: "50px", height: "50px" }}>
-              {isPenOn ? (
-                <img
-                  src="./1021031_pen_icon.png"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                  }}
-                ></img>
-              ) : (
-                <></>
-              )}
-            </div>
-          </button>
-        </div>
-        <div style={{ float: "left" }}>
-          <button onClick={() => setIsPumpOn(!isPumpOn)}>
-            <div style={{ width: "50px", height: "50px" }}>Pump</div>
-          </button>
-          {isPumpOn ? (
-            <ul style={{ flex: "wrap", float: "right", listStyle: "none" }}>
-              <li>
-                {" "}
-                <input
-                  type="text"
-                  placeholder="IP address"
-                  onChange={(e) => setIp(e.target.value)}
-                  value={ip}
-                ></input>
-              </li>
-              <li>
-                <input
-                  type="text"
-                  placeholder="Operation"
-                  onChange={(e) => setOperation(e.target.value)}
-                  value={operation}
-                ></input>
-              </li>
-              <li>
-                <button
-                  onClick={() =>
-                    fetch(`http://${ip}/${operation}`, {
-                      method: "GET",
-                    })
-                  }
-                >
-                  Send http://{ip}/{operation}
-                </button>
-              </li>
-            </ul>
-          ) : (
-            <></>
-          )}
-        </div>
-        <div style={{ float: "left" }}>
-          <button onClick={() => setMonoview(!isMonoview)}>
-            {" "}
-            <div style={{ width: "50px", height: "50px" }}>
-              {isMonoview ? "To Multi" : "To Mono"}
-            </div>
-          </button>
-          {isMonoview ? (
-            <input
-              type="number"
-              min="0"
-              max="3"
-              value={monoviewId}
-              onChange={(e) => {
-                setMonoviewId(Number(e.target.value));
-              }}
-            />
-          ) : (
-            <></>
-          )}
-        </div>
-        <textarea
-          value={text}
-          style={{ float: "left" }}
-          onChange={(e) => {
-            setText(e.target.value);
-          }}
-        />
-        <button
-          onClick={function () {
-            const lines = text.split("\n");
-            setSideN(Number(lines[0].split(",")[0]));
-            setTallN(Number(lines[0].split(",")[1]));
-            setRadius(Number(lines[0].split(",")[2]));
-            const newColors = lines.slice(1).map((line) => {
-              const fields = line.split(",");
-              return fields;
-            });
-            setColor2dAry(newColors);
-          }}
-        >
-          ToSVG
-        </button>
-      </div>
+      {UI}
       <div>
         <svg
           id="svg"
