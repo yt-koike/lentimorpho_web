@@ -412,9 +412,8 @@ export default function Home() {
                   fetch(`http://${ip}/${operation}`, {
                     method: "GET",
                   })
-                    .then((res) => res.json())
-                    .then((json) => console.log(json))
-                    .catch(() => alert("error"));
+                    .then((res) => res.text())
+                    .catch(() => console.log("error"));
                 }}
               >
                 Send http://{ip}/{operation}
